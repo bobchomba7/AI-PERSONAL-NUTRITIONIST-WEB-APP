@@ -10,7 +10,7 @@ const ContextProvider = (props) => {
     const [showResult, setShowResult] = useState(false);
     const [loading, setLoading] = useState(false);
     const [resultData, setResultData] = useState("");
-    
+    const [selectedImage, setSelectedImage] = useState(null); // New State for Image
 
     const delayPara = (index, nextWord) => {
         setTimeout(() => {
@@ -82,7 +82,8 @@ const ContextProvider = (props) => {
             resultData,
             input,
             setInput,
-            newChat
+            newChat,
+            selectedImage
             
         }}>
             {props.children}
