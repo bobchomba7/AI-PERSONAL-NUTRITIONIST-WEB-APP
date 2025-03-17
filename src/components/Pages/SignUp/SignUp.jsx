@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './SignUp.css'; // Ensure this path is correct
-import { SignUp } from '../../../config/firebase';
+import { signup } from '../../../config/firebase';
 
 const SignUp = () => {
   const [username, setUsername] = useState('');
