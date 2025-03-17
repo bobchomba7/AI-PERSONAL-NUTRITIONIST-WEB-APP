@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './signup.css'; // Ensure this path is correct
+import './SignUp.css'; // Ensure this path is correct
 import { signup } from '../../../config/firebase';
 
 const SignUp = () => {
@@ -47,6 +47,9 @@ const SignUp = () => {
             />
           </div>
           <button type="button" onClick={handleSignUp}>Sign Up</button>
+          <p>
+          already have an account? <a href="/login">Login</a>
+        </p>
         </form>
       </div>
     </div>

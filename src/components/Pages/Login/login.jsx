@@ -68,7 +68,7 @@ const Login = () => {
           <button type="button" onClick={handleLogin}>Log In</button>
         </form>
         <p>
-          don't have account? <a href="/signup">SIGN UP</a>
+          don't have account? <a href="/SignUp">SIGN UP</a>
         </p>
       </div>
     </div>
