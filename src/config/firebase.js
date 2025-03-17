@@ -17,7 +17,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const signup = async (username, email, password) => {
+const SignUp = async (username, email, password) => {
   try {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     const user = res.user;
@@ -65,4 +65,4 @@ const getChats = async (userId) => {
   }
 };
 
-export { signup, login, saveChat, getChats };
+export { SignUp, login, saveChat, getChats };
