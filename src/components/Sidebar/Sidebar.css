@@ -3,7 +3,7 @@
     display: inline-flex;
     flex-direction: column;
     justify-content: space-between;
-    background-color: rgba(95, 187, 111, 0.801);
+    background-color: rgba(15, 175, 42, 0.801);
     padding: 26px  16px;
 
 }
@@ -26,10 +26,10 @@
     align-items: center;
     gap: 10px;
     padding: 10px 15px;
-    background-color: rgb(7, 105, 81);
-    border-radius: 50px;
+    background-color: rgb(1, 95, 6);
+    border-radius: 45px;
     font-size: large;
-    color: azure;
+    color: rgb(255, 255, 255);
     cursor: pointer;
 
 }

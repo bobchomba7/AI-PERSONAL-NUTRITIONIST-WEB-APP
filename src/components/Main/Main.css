@@ -11,16 +11,16 @@
     justify-content: space-between;
     font-size: 22px;
     padding: 20px;
-    color: rgb(0, 0, 0);
+    color: rgb(16, 134, 1);
 }
 
 .main .nav img{
-    width: 40px;
+    width: 60px;
     border-radius: 50%;
 
 }
 
-.main-conatiner{
+.main-container{
     max-width: 900px;
     margin: auto;
 
@@ -123,9 +123,10 @@
     font-weight: 290;
 }
 .result{
-    padding:0px 5%;
-    max-height: 60vh;
+    padding:0px 2%;
+    max-height: 70vh;
     overflow-y: scroll;
+    text-align: left;
 }
 
 .result::-webkit-scrollbar{
@@ -134,21 +135,18 @@
 .result-title{
     font-size: 20px;
     margin: 50px 0px;
-    display: flex;
-    align-items: center;
+    display: left;
+    align-items:left;
     gap: 20px;
 
 }
 .result img{
     width: 50px;
-    border-radius: 40%;
+    height: auto;
+    border-radius: 0%;
 
 }
-.result-data{
-    display:flex;
-    align-items: start;
-    gap:20px;
-}
+
 .loader{
     width: 100%;
     display: flex;
@@ -176,10 +174,16 @@
 }
 
 .result-data p{
-    font-size: 18px;
+    font-size: 24px;
     color: rgb(0, 0, 0);
     font-weight: 300px;
-    line-height: 1.8;
+    line-height: 2.0;
+    position: relative;
+    padding: 10px;
+    background-color: rgb(193, 255, 224);
+    border-radius: 10px;
+    margin: 10px 0px;
+
 
 }
 @media (max-width:600px){
@@ -197,4 +201,19 @@
     .search-box div{
         gap:5px;
     }
+}
+/* Main.css */
+.search-box input[type="file"] {
+    display: none;
+}
+
+.search-box label {
+    cursor: pointer;
+}
+/* Main.css */
+.uploaded-image {
+    max-width: 1000px;
+    max-height: 40px;
+    margin: 7px;
+    border-radius: 5px;
 }

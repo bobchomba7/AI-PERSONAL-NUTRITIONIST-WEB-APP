@@ -1,0 +1,98 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #d4e8d0;
+    min-width: 100vw;
+    padding: 20px; /* More reasonable value */
+}
+
+.form-wrapper {
+    background-color: #a3c9a8;
+    padding: 90px;
+    margin-bottom: 10px;
+    border-radius: 19px;
+    min-width: 40%;
+    min-height: 50%;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-wrapper h2 {
+    font-size: em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background-color: #fff;
+    font-size: 1em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-transform: capitalize;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #1b5e20;
+}
+
+.form-wrapper p {
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #333;
+}
+
+.form-wrapper p a {
+    color: #2e7d32;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.form-wrapper p a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: #d32f2f; /* Red color for error */
+    font-size: 0.9em;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+@media (max-width: 480px) {
+    .form-wrapper {
+        width: 90%;
+        padding: 20px;
+    }
+}

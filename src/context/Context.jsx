@@ -1,5 +1,7 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import runChat from "../config/gemini";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { saveChat, getChats } from "../config/firebase";
 
 export const Context = createContext();
 
@@ -10,7 +12,31 @@ const ContextProvider = (props) => {
     const [showResult, setShowResult] = useState(false);
     const [loading, setLoading] = useState(false);
     const [resultData, setResultData] = useState("");
-    const [selectedImage, setSelectedImage] = useState(null); // New State for Image
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [user, setUser] = useState(null);
+    const [authLoading, setAuthLoading] = useState(true);
+
+    const auth = getAuth();
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUser(user);
+                fetchChats(user.uid);
+            } else {
+                setUser(null);
+            }
+            setAuthLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [auth]);
+
+    const fetchChats = async (userId) => {
+        const chats = await getChats(userId);
+        setPrevPrompts(chats);
+    };
 
     const delayPara = (index, nextWord) => {
         setTimeout(() => {
@@ -21,9 +47,8 @@ const ContextProvider = (props) => {
     const newChat = () => {
         setLoading(false);
         setShowResult(false);
-        
+        setImagePreview(null);
     };
-    
 
     const onSent = async (prompt) => {
         setResultData("");
@@ -57,16 +82,30 @@ const ContextProvider = (props) => {
             delayPara(i, nextWord + " ");
         }
 
+        if (user) {
+            await saveChat(user.uid, { prompt: recentPrompt, response: newResponse2 });
+        }
+
         setLoading(false);
         setInput("");
-        
+        setSelectedImage(null);
+        setImagePreview(null);
     };
-    
 
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
             setSelectedImage(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const logout = async () => {
+        try {
+            await signOut(auth);
+            setUser(null); // Manually update user state
+        } catch (error) {
+            console.error("Logout error:", error);
         }
     };
 
@@ -83,10 +122,13 @@ const ContextProvider = (props) => {
             input,
             setInput,
             newChat,
-            selectedImage
-            
+            selectedImage,
+            handleImageUpload,
+            imagePreview,
+            user,
+            logout, // Add logout function to context value
         }}>
-            {props.children}
+            {!authLoading && props.children}
         </Context.Provider>
     );
 };
