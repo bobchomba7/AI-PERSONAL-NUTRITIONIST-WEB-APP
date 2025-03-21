@@ -3,10 +3,9 @@ import './Main.css';
 import { assets } from "../../assets/assets";
 import { Context } from "../../context/Context";
 
-
 const Main = () => {
     const { onSent, recentPrompt, showResult, loading, resultData,
-        setInput, input, handleImageUpload, imagePreview, user } = useContext(Context);
+        setInput, input, handleImageUpload, user, chatHistory } = useContext(Context);
 
     return (
         <div className='main'>
@@ -43,18 +42,28 @@ const Main = () => {
                 ) : (
                     <div className="result">
                         <div className="result-data">
-                            <img src={assets.gemini_icon} alt="" />
-                            {loading ? (
-                                <div className="loader">
-                                    <hr />
-                                    <hr />
+                            {chatHistory.map((message, index) => (
+                                <div key={index} className={message.role === "user" ? "user-message" : "ai-message"}>
+                                    {message.role === "assistant" && <img src={assets.gemini_icon} alt="" />}
+                                    <div className="message-content">
+                                        {/* Use resultData for the latest AI response with typing effect, otherwise use message.content */}
+                                        {message.role === "assistant" && index === chatHistory.length - 1 && loading ? (
+                                            <div className="loader">
+                                                <hr />
+                                                <hr />
+                                                <hr />
+                                            </div>
+                                        ) : message.role === "assistant" && index === chatHistory.length - 1 ? (
+                                            <p dangerouslySetInnerHTML={{ __html: resultData }}></p>
+                                        ) : (
+                                            <p dangerouslySetInnerHTML={{ __html: message.content }}></p>
+                                        )}
+                                        {message.imageUrl && (
+                                            <img src={message.imageUrl} alt="Uploaded" className="uploaded-image" />
+                                        )}
+                                    </div>
                                 </div>
-                            ) : (
-                                <>
-                                    <p dangerouslySetInnerHTML={{ __html: resultData }}></p>
-                                    {imagePreview && <img src={imagePreview} alt="Uploaded" className="uploaded-image" />}
-                                </>
-                            )}
+                            ))}
                         </div>
                     </div>
                 )}

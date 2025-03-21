@@ -6,18 +6,13 @@ import { useNavigate } from 'react-router-dom';
 
 const Sidebar = () => {
     const [extended, setExtended] = useState(false);
-    const { onSent, prevPrompts, setRecentPrompt, newChat, logout } = useContext(Context);
+    const { prevPrompts, newChat, logout, loadChatHistory } = useContext(Context);
     const navigate = useNavigate();
-
-    const loadPrompt = async (prompt) => {
-        setRecentPrompt(prompt);
-        await onSent(prompt);
-    };
 
     const handleLogout = async () => {
         try {
-            await logout(); // Call the logout function from Context
-            navigate('/login'); // Redirect to login page after successful logout
+            await logout();
+            navigate('/login');
         } catch (error) {
             console.error("Logout error:", error);
         }
@@ -37,9 +32,9 @@ const Sidebar = () => {
                         {prevPrompts.map((item, index) => {
                             const promptText = typeof item === 'string' ? item : item.prompt;
                             return (
-                                <div key={index} onClick={() => loadPrompt(promptText)} className="recent-entry">
+                                <div key={index} onClick={() => loadChatHistory(item)} className="recent-entry">
                                     <img src={assets.message_icon} alt="" />
-                                    <p>{promptText.slice(0, 25)}..</p>
+                                    <p>{promptText.slice(0, 20)}..</p>
                                 </div>
                             );
                         })}

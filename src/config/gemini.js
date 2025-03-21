@@ -3,12 +3,11 @@ import {
     HarmCategory,
     HarmBlockThreshold,
 } from "@google/generative-ai";
-import * as fs from 'node:fs';
 
-const MODEL_NAME = "gemini-2.0-flash";
-const API_KEY = "AIzaSyA9a-X6h-pqMF5Kbwbbvcl9Kfv9zxoHa0A";
+const MODEL_NAME = "gemini-1.5-flash";
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyA9a-X6h-pqMF5Kbwbbvcl9Kfv9zxoHa0A";
 
-function fileToGenerativePart(file) {
+const fileToGenerativePart = (file) => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -23,54 +22,72 @@ function fileToGenerativePart(file) {
         reader.onerror = reject;
         reader.readAsDataURL(file);
     });
-}
+};
 
-async function runChat(prompt, imageFile = null) {
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+const runChat = async (chatHistory, selectedImage = null) => {
+    try {
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-    const generationConfig = {
-        temperature: 1,
-        topP: 0.95,
-        topK: 40,
-        maxOutputTokens: 8192,
-        responseMimeType: "text/plain",
-    };
+        const generationConfig = {
+            temperature: 1,
+            topP: 0.95,
+            topK: 40,
+            maxOutputTokens: 8192,
+            responseMimeType: "text/plain",
+        };
 
-    const safetySettings = [
-        {
-            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-    ];
+        const safetySettings = [
+            {
+                category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+                threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            },
+            {
+                category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            },
+            {
+                category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            },
+            {
+                category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            },
+        ];
 
-    const chat = model.startChat({
-        generationConfig,
-        safetySettings,
-        history: [],
-    });
+        // Map chatHistory to Gemini API's history format
+        const history = chatHistory
+            .filter((item, index) => index < chatHistory.length - 1) // Exclude the latest user prompt
+            .map((item) => ({
+                role: item.role === "user" ? "user" : "model",
+                parts: item.imageUrl && item.role === "user"
+                    ? [{ text: item.content }, { inlineData: { data: item.imageUrl, mimeType: "image/jpeg" } }]
+                    : [{ text: item.content }],
+            }));
 
-    const content = imageFile
-        ? [prompt, await fileToGenerativePart(imageFile)]
-        : [prompt];
+        const chat = model.startChat({
+            generationConfig,
+            safetySettings,
+            history,
+        });
 
-    const result = await chat.sendMessage(content);
-    const response = result.response;
-    console.log(response.text());
-    return response.text();
-}
+        const latestPrompt = chatHistory.length > 0 ? chatHistory[chatHistory.length - 1].content : "";
 
+        const content = selectedImage
+            ? [latestPrompt, await fileToGenerativePart(selectedImage)]
+            : [latestPrompt];
+
+        const result = await chat.sendMessage(content);
+        const response = result.response;
+        const responseText = response.text();
+
+        console.log("Gemini Response:", responseText);
+        return responseText || "No response";
+    } catch (error) {
+        console.error("Error in runChat:", error);
+        throw error;
+    }
+};
 
 export default runChat;

@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getFirestore, setDoc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Add Storage imports
 import { toast } from "react-toastify";
 
 const firebaseConfig = {
@@ -16,6 +17,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app); // Initialize Storage
 
 const signup = async (username, email, password) => {
   try {
@@ -23,9 +25,9 @@ const signup = async (username, email, password) => {
     const user = res.user;
     await setDoc(doc(db, "users", user.uid), {
       id: user.uid,
-      username: username, // Store the username
+      username: username,
       email,
-      name: username // Optionally store the name separately if needed
+      name: username
     });
     await setDoc(doc(db, "chats", user.uid), {
       chatData: []
@@ -37,7 +39,6 @@ const signup = async (username, email, password) => {
   }
 };
 
-
 const login = async (email, password) => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
@@ -45,6 +46,19 @@ const login = async (email, password) => {
   } catch (error) {
     console.error(error);
     toast.error("Failed to log in");
+  }
+};
+
+// Function to upload image to Firebase Storage and return the download URL
+const uploadImage = async (userId, imageFile) => {
+  try {
+    const imageRef = ref(storage, `images/${userId}/${Date.now()}_${imageFile.name}`);
+    await uploadBytes(imageRef, imageFile);
+    const downloadURL = await getDownloadURL(imageRef);
+    return downloadURL;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    throw error;
   }
 };
 
@@ -65,4 +79,4 @@ const getChats = async (userId) => {
   }
 };
 
-export { signup, login, saveChat, getChats };
+export { signup, login, saveChat, getChats, uploadImage };

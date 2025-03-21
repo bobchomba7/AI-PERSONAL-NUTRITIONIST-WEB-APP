@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import './SignUp.css'; // Ensure this path is correct
+import './SignUp.css';
 import { signup } from '../../../config/firebase';
+import { Link } from 'react-router-dom'; // Import Link
 
 const SignUp = () => {
   const [username, setUsername] = useState('');
@@ -48,8 +49,8 @@ const SignUp = () => {
           </div>
           <button type="button" onClick={handleSignUp}>Sign Up</button>
           <p>
-          already have an account? <a href="/login">Login</a>
-        </p>
+            already have an account? <Link to="/login">Login</Link>
+          </p>
         </form>
       </div>
     </div>

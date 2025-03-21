@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import runChat from "../config/gemini";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import { saveChat, getChats } from "../config/firebase";
+import { saveChat, getChats, uploadImage } from "../config/firebase";
 
 export const Context = createContext();
 
@@ -16,6 +16,8 @@ const ContextProvider = (props) => {
     const [imagePreview, setImagePreview] = useState(null);
     const [user, setUser] = useState(null);
     const [authLoading, setAuthLoading] = useState(true);
+    const [chatHistory, setChatHistory] = useState([]);
+    const [currentChatId, setCurrentChatId] = useState(null);
 
     const auth = getAuth();
 
@@ -26,6 +28,8 @@ const ContextProvider = (props) => {
                 fetchChats(user.uid);
             } else {
                 setUser(null);
+                setChatHistory([]);
+                setPrevPrompts([]);
             }
             setAuthLoading(false);
         });
@@ -38,6 +42,19 @@ const ContextProvider = (props) => {
         setPrevPrompts(chats);
     };
 
+    const loadChatHistory = (chat) => {
+        // Load a previous chat into chatHistory
+        const history = [
+            { role: "user", content: chat.prompt, imageUrl: chat.imageUrl || null },
+            { role: "assistant", content: chat.response, imageUrl: null },
+        ];
+        setChatHistory(history);
+        setCurrentChatId(chat.id || Date.now().toString());
+        setShowResult(true);
+        setResultData(chat.response); // Set resultData to display the AI response immediately
+        setRecentPrompt(chat.prompt);
+    };
+
     const delayPara = (index, nextWord) => {
         setTimeout(() => {
             setResultData((prev) => prev + nextWord);
@@ -48,6 +65,10 @@ const ContextProvider = (props) => {
         setLoading(false);
         setShowResult(false);
         setImagePreview(null);
+        setChatHistory([]);
+        setRecentPrompt("");
+        setResultData("");
+        setCurrentChatId(Date.now().toString());
     };
 
     const onSent = async (prompt) => {
@@ -55,41 +76,72 @@ const ContextProvider = (props) => {
         setLoading(true);
         setShowResult(true);
 
-        let response;
-        if (prompt !== undefined) {
-            response = await runChat(prompt, selectedImage);
-            setRecentPrompt(prompt);
-        } else {
-            setPrevPrompts((prev) => [...prev, input]);
-            setRecentPrompt(input);
-            response = await runChat(input, selectedImage);
-        }
+        let userMessage = prompt || input;
+        let imageUrl = null;
 
-        let responseArray = response.split("**");
-        let newResponse = "";
-        for (let i = 0; i < responseArray.length; i++) {
-            if (i === 0 || i % 2 !== 1) {
-                newResponse += responseArray[i];
-            } else {
-                newResponse += "<b>" + responseArray[i] + "</b>";
+        if (selectedImage && user) {
+            try {
+                imageUrl = await uploadImage(user.uid, selectedImage);
+            } catch (error) {
+                console.error("Failed to upload image:", error);
+                setResultData("Error uploading image. Please try again.");
+                setLoading(false);
+                return;
             }
         }
 
-        let newResponse2 = newResponse.split("*").join("</br>");
-        let newResponseArray = newResponse2.split(" ");
-        for (let i = 0; i < newResponseArray.length; i++) {
-            const nextWord = newResponseArray[i];
-            delayPara(i, nextWord + " ");
-        }
+        setChatHistory((prev) => [
+            ...prev,
+            { role: "user", content: userMessage, imageUrl: imageUrl || null },
+        ]);
 
-        if (user) {
-            await saveChat(user.uid, { prompt: recentPrompt, response: newResponse2 });
-        }
+        let response;
+        try {
+            response = await runChat(chatHistory.concat({ role: "user", content: userMessage, imageUrl }), selectedImage);
+            setRecentPrompt(userMessage);
 
-        setLoading(false);
-        setInput("");
-        setSelectedImage(null);
-        setImagePreview(null);
+            let responseArray = response.split("**");
+            let newResponse = "";
+            for (let i = 0; i < responseArray.length; i++) {
+                if (i === 0 || i % 2 !== 1) {
+                    newResponse += responseArray[i];
+                } else {
+                    newResponse += "<b>" + responseArray[i] + "</b>";
+                }
+            }
+
+            let newResponse2 = newResponse.split("*").join("</br>");
+            let newResponseArray = newResponse2.split(" ");
+
+            setChatHistory((prev) => [
+                ...prev,
+                { role: "assistant", content: newResponse2, imageUrl: null },
+            ]);
+
+            for (let i = 0; i < newResponseArray.length; i++) {
+                const nextWord = newResponseArray[i];
+                delayPara(i, nextWord + " ");
+            }
+
+            if (user) {
+                const chatData = {
+                    id: currentChatId || Date.now().toString(),
+                    prompt: userMessage,
+                    response: newResponse2,
+                    imageUrl: imageUrl || null,
+                };
+                await saveChat(user.uid, chatData);
+                setPrevPrompts((prev) => [...prev, chatData]);
+            }
+        } catch (error) {
+            console.error("Error in onSent:", error);
+            setResultData("Sorry, an error occurred. Please try again.");
+        } finally {
+            setLoading(false);
+            setInput("");
+            setSelectedImage(null);
+            setImagePreview(null);
+        }
     };
 
     const handleImageUpload = (event) => {
@@ -103,7 +155,9 @@ const ContextProvider = (props) => {
     const logout = async () => {
         try {
             await signOut(auth);
-            setUser(null); // Manually update user state
+            setUser(null);
+            setChatHistory([]);
+            setCurrentChatId(null);
         } catch (error) {
             console.error("Logout error:", error);
         }
@@ -126,7 +180,10 @@ const ContextProvider = (props) => {
             handleImageUpload,
             imagePreview,
             user,
-            logout, // Add logout function to context value
+            logout,
+            chatHistory,
+            loadChatHistory,
+            currentChatId,
         }}>
             {!authLoading && props.children}
         </Context.Provider>
