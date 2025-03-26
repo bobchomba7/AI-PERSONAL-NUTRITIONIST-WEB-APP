@@ -1,8 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react';
 import './login.css';
-import { useNavigate, Link } from 'react-router-dom'; // Add Link
+import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../../../config/firebase';
 import { Context } from '../../../context/Context';
+import { db } from '../../../config/firebase'; // Import Firebase DB
+import { updateDoc, doc, increment } from 'firebase/firestore'; // Firestore Functions
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/main');
+      navigate('/Dashboard');
     }
   }, [user, navigate]);
 
@@ -25,7 +27,16 @@ const Login = () => {
     }
 
     try {
-      await login(email, password);
+      const userCredential = await login(email, password);
+      const loggedInUser = userCredential.user;
+
+      // Update Firestore login count
+      const userRef = doc(db, "users", loggedInUser.uid);
+      await updateDoc(userRef, {
+        "stats.logins": increment(1),
+      });
+
+      navigate('/Dashboard');
     } catch (err) {
       setError('Failed to log in. Please check your credentials.');
     }
@@ -60,7 +71,7 @@ const Login = () => {
           <button type="button" onClick={handleLogin}>Log In</button>
         </form>
         <p>
-          don't have account? <Link to="/signup">SIGN UP</Link>
+          Don't have an account? <Link to="/signup">SIGN UP</Link>
         </p>
       </div>
     </div>

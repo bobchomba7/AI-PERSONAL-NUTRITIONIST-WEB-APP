@@ -41,7 +41,6 @@ const ContextProvider = (props) => {
         const chats = await getChats(userId);
         setPrevPrompts(chats);
     };
-
     const loadChatHistory = (chat) => {
         // Load a previous chat into chatHistory
         const history = [
@@ -55,21 +54,6 @@ const ContextProvider = (props) => {
         setRecentPrompt(chat.prompt);
     };
 
-    const delayPara = (index, nextWord) => {
-        setTimeout(() => {
-            setResultData((prev) => prev + nextWord);
-        }, 75 * index);
-    };
-
-    const newChat = () => {
-        setLoading(false);
-        setShowResult(false);
-        setImagePreview(null);
-        setChatHistory([]);
-        setRecentPrompt("");
-        setResultData("");
-        setCurrentChatId(Date.now().toString());
-    };
 
     const onSent = async (prompt) => {
         setResultData("");
@@ -79,12 +63,15 @@ const ContextProvider = (props) => {
         let userMessage = prompt || input;
         let imageUrl = null;
 
+
+
         if (selectedImage && user) {
             try {
                 imageUrl = await uploadImage(user.uid, selectedImage);
             } catch (error) {
                 console.error("Failed to upload image:", error);
                 setResultData("Error uploading image. Please try again.");
+                logToTerminal("Test Failed: Image upload error");
                 setLoading(false);
                 return;
             }
@@ -95,53 +82,55 @@ const ContextProvider = (props) => {
             { role: "user", content: userMessage, imageUrl: imageUrl || null },
         ]);
 
-        let response;
         try {
-            response = await runChat(chatHistory.concat({ role: "user", content: userMessage, imageUrl }), selectedImage);
+            const response = await runChat(
+                chatHistory.concat({ role: "user", content: userMessage, imageUrl }),
+                selectedImage
+            );
+
             setRecentPrompt(userMessage);
 
-            let responseArray = response.split("**");
-            let newResponse = "";
-            for (let i = 0; i < responseArray.length; i++) {
-                if (i === 0 || i % 2 !== 1) {
-                    newResponse += responseArray[i];
-                } else {
-                    newResponse += "<b>" + responseArray[i] + "</b>";
-                }
-            }
-
-            let newResponse2 = newResponse.split("*").join("</br>");
-            let newResponseArray = newResponse2.split(" ");
+            let formattedResponse = response.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>").replace(/\*/g, "<br/>");
 
             setChatHistory((prev) => [
                 ...prev,
-                { role: "assistant", content: newResponse2, imageUrl: null },
+                { role: "assistant", content: formattedResponse, imageUrl: null },
             ]);
 
-            for (let i = 0; i < newResponseArray.length; i++) {
-                const nextWord = newResponseArray[i];
-                delayPara(i, nextWord + " ");
-            }
+            setResultData(formattedResponse);
 
             if (user) {
                 const chatData = {
                     id: currentChatId || Date.now().toString(),
                     prompt: userMessage,
-                    response: newResponse2,
+                    response: formattedResponse,
                     imageUrl: imageUrl || null,
                 };
                 await saveChat(user.uid, chatData);
                 setPrevPrompts((prev) => [...prev, chatData]);
             }
+
+            logToTerminal(`Test Passed: Received AI response - ${formattedResponse}`);
         } catch (error) {
             console.error("Error in onSent:", error);
             setResultData("Sorry, an error occurred. Please try again.");
+            logToTerminal("Test Failed: AI response error");
         } finally {
             setLoading(false);
             setInput("");
             setSelectedImage(null);
             setImagePreview(null);
         }
+    };
+
+    const newChat = () => {
+        setLoading(false);
+        setShowResult(false);
+        setImagePreview(null);
+        setChatHistory([]);
+        setRecentPrompt("");
+        setResultData("");
+        setCurrentChatId(Date.now().toString());
     };
 
     const handleImageUpload = (event) => {
@@ -164,27 +153,30 @@ const ContextProvider = (props) => {
     };
 
     return (
-        <Context.Provider value={{
-            prevPrompts,
-            setPrevPrompts,
-            onSent,
-            setRecentPrompt,
-            recentPrompt,
-            showResult,
-            loading,
-            resultData,
-            input,
-            setInput,
-            newChat,
-            selectedImage,
-            handleImageUpload,
-            imagePreview,
-            user,
-            logout,
-            chatHistory,
-            loadChatHistory,
-            currentChatId,
-        }}>
+        <Context.Provider
+            value={{
+                prevPrompts,
+                setPrevPrompts,
+                onSent,
+                setRecentPrompt,
+                recentPrompt,
+                showResult,
+                loading,
+                resultData,
+                input,
+                setInput,
+                newChat,
+                selectedImage,
+                handleImageUpload,
+                imagePreview,
+                user,
+                logout,
+                chatHistory,
+                loadChatHistory,
+                currentChatId,
+               
+            }}
+        >
             {!authLoading && props.children}
         </Context.Provider>
     );

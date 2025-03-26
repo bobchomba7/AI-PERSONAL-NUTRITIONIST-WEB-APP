@@ -1,0 +1,28 @@
+.profile-container {
+    text-align: center;
+    padding: 30px;
+    background-color: #95fd92;
+    font-family: "Arial", sans-serif;
+}
+
+.profile-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    min-width: 1000px;
+    min-height: 200px;
+    margin: auto;
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+input[type="file"] {
+    margin-top: 10px;
+}

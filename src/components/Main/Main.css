@@ -85,7 +85,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    background-color: rgb(158, 209, 115);
+    background-color: rgb(144, 211, 90);
     padding: 10px 20px;
     border-radius: 50px;
 }
@@ -118,7 +118,7 @@
 }
 
 .result {
-    padding: 0px 2%;
+    padding: 0px 0%;
     max-height: 70vh;
     overflow-y: scroll;
 }
@@ -130,11 +130,10 @@
 .result-data {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
 }
 
 .user-message {
-    align-self: flex-start;
     max-width: 70%;
     display: flex;
     flex-direction: column;
@@ -144,13 +143,12 @@
 .ai-message {
     align-self: flex-end;
     max-width: 70%;
-    display: flex;
     align-items: flex-start;
     gap: 10px;
 }
 
 .message-content {
-    background-color: rgb(42, 241, 109);
+    background-color: rgb(92, 248, 144);
     padding: 10px;
     border-radius: 6px;
     font-size: 24px;

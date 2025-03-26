@@ -1,0 +1,84 @@
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    font-family: "Arial", sans-serif;
+    background-color: #ade757;
+    font-size: 20px;
+    font-weight: bold;
+    overflow-x: hidden; /* Prevents horizontal scroll */
+  }
+  
+  .dashboard-sidebar2 {
+    width: 280px;
+    background-color: rgba(15, 175, 42, 0.801);
+    color: black;
+    padding: 40px; /* Reduced padding for better balance */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .dashboard-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto; /* Allows scrolling when content overflows */
+    padding: 20px;
+  }
+  
+  .dashboard-stats {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+    flex-wrap: wrap; /* Ensures cards wrap on smaller screens */
+    justify-content: center;
+  }
+  
+  .dashboard-card {
+    background: #a6f071;
+    min-width: 250px;
+    min-height: 150px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  /* Chart Styling */
+  .dashboard-chart {
+    background: rgb(206, 255, 219);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    width: 100%;
+    max-width: 690px; /* Prevents the chart from stretching too much */
+    text-align: left;
+  }
+  
+  .dashboard-button {
+    background-color: #148106;
+    min-width: 180px;
+    color: black;
+    border: none;
+    padding: 12px 24px;
+    margin-top: 35px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 22px;
+    font-weight: bold;
+    transition:0.3s ease;
+  }
+  
+  .dashboard-button:hover {
+    background-color: #35eb19;
+  }
+  

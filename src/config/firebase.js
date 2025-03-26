@@ -1,8 +1,10 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getFirestore, setDoc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Add Storage imports
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"; 
+import { getPerformance } from "firebase/performance"; 
 import { toast } from "react-toastify";
+import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBHu7yK654XvPTink-3Kz-JyFRhCzkQ-HM",
@@ -16,8 +18,10 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app); // Initialize Storage
+const db = getFirestore(app);  // ✅ Firestore instance
+const storage = getStorage(app); 
+const performance = getPerformance(app);
+const analytics = getAnalytics(app);
 
 const signup = async (username, email, password) => {
   try {
@@ -49,7 +53,6 @@ const login = async (email, password) => {
   }
 };
 
-// Function to upload image to Firebase Storage and return the download URL
 const uploadImage = async (userId, imageFile) => {
   try {
     const imageRef = ref(storage, `images/${userId}/${Date.now()}_${imageFile.name}`);
@@ -79,4 +82,5 @@ const getChats = async (userId) => {
   }
 };
 
-export { signup, login, saveChat, getChats, uploadImage };
+
+export { auth, db, signup, login, saveChat, getChats, uploadImage };

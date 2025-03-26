@@ -1,20 +1,17 @@
 import React from "react";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Main from "./components/Main/Main";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
-const App= () => {
+const App = () => {
   return (
     <>
-      <ToastContainer/>
-      <Sidebar/>
-      <Main/>
-
-
+      <ToastContainer />
+      <Sidebar />
+      <Main />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

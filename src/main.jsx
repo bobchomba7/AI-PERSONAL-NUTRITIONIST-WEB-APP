@@ -8,10 +8,12 @@ import LandingPage from './components/Pages/LandingPage/LandingPage';
 import Login from './components/Pages/Login/login.jsx';
 import SignUp from './components/Pages/SignUp/SignUp';
 import Main from './components/Main/Main';
+import Profile from './components/Pages/Profile/Profile';
+import Dashboard from './components/Pages/Dashboard/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Sidebar from './components/Sidebar/Sidebar.jsx';
+import { auth } from './config/firebase';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ContextProvider>
@@ -20,11 +22,18 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/main" element={
             <ProtectedRoute>
-              <App/>
-              
-              
+              <App />
+            </ProtectedRoute>
+          }
+        />
+        
+
+        <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard userId={auth.currentUser ? auth.currentUser.uid : null} />
             </ProtectedRoute>
           }
         />

@@ -1,9 +1,10 @@
+/* General styling for the landing page */
 .landing-page {
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 100vh;
-    background-color: #d4e8d0; /* Light green from the image */
+    background-color: #d4e8d0;
     padding: 20px;
     position: relative;
     overflow: hidden;
@@ -12,59 +13,66 @@
 .landing-page .content {
     flex: 1;
     padding: 40px;
-    max-width: 70%;
+    max-width: 50%;
     z-index: 1;
 }
 
 .landing-page h1 {
     font-size: 3em;
-    align-items: center;
-    margin: 0;
-    color: #2e7d32; /* Dark green for the heading */
+    color: #2e7d32;
     font-weight: bold;
 }
 
-.landing-page p {
+.landing-page h2 {
     font-size: 2em;
-    color: #333;
-    line-height: 1.6;
-    margin: 90px 0;
+    font-weight: bold;
+    color: #1b5e20;
 }
 
+.landing-page p {
+    font-size: 1.2em;
+    color: #333;
+    line-height: 1.6;
+    margin: 20px 0;
+}
 
 .get-started-button {
-    background-color: #184b1b; /* Dark green button */
+    background-color: #184b1b;
     color: white;
     padding: 12px 30px;
     border: none;
     border-radius: 9px;
-    font-size: 2em;
+    font-size: 1.5em;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
 .get-started-button:hover {
-    background-color: #13a71d; /* Darker green on hover */
+    background-color: #13a71d;
 }
 
 .image-section {
     flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100%;
-    background-size: contain; /* Changed from cover to contain to avoid excessive zooming */
-    background-position: center; /* Center the image */
-    background-repeat: no-repeat; /* Prevent tiling */
-    border-top-left-radius: 30px;
-    border-bottom-left-radius: 30px;
-    border-top-right-radius: 30px;
-    border-bottom-right-radius: 30px;
-    overflow: hidden;
+    padding: 20px;
 }
 
-@media (max-width: 768px) {
+.image-section img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 30px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
     .landing-page {
         flex-direction: column;
-        height: auto;
         text-align: center;
+        height: auto;
+        padding: 20px;
     }
 
     .landing-page .content {
@@ -72,15 +80,32 @@
         padding: 20px;
     }
 
-    .image-section {
-        height: 300px;
-        width: 100%;
-        background-size: contain; /* Ensure it scales properly on mobile */
-        background-position: center;
-        border-radius: 0;
-        margin-top: 20px;
+    .landing-page h1 {
+        font-size: 2.5em;
     }
 
-    
-    
+    .landing-page h2 {
+        font-size: 1.8em;
+    }
+
+    .landing-page p {
+        font-size: 1.1em;
+    }
+
+    .get-started-button {
+        font-size: 1.2em;
+        padding: 10px 20px;
+    }
+
+    .image-section {
+        width: 100%;
+        height: auto;
+        padding: 10px;
+    }
+
+    .image-section img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 20px;
+    }
 }
