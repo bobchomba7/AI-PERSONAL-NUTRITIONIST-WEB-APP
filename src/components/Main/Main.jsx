@@ -1,14 +1,29 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";  // Import navigation
 import './Main.css';
 import { assets } from "../../assets/assets";
 import { Context } from "../../context/Context";
-import { db } from "../../config/firebase";
-import { updateDoc, doc, increment } from "firebase/firestore";
+import { db, auth } from "../../config/firebase";
+import { updateDoc, doc, increment, getDoc } from "firebase/firestore";
 
 const Main = () => {
     const navigate = useNavigate();  // Initialize navigation
     const { onSent, setInput, input, handleImageUpload, user, chatHistory, showResult } = useContext(Context);
+    const [profileImage, setProfileImage] = useState(null);
+
+    useEffect(() => {
+        const fetchProfileImage = async () => {
+            if (!user) return;
+            const userRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(userRef);
+
+            if (docSnap.exists()) {
+                setProfileImage(docSnap.data().profilePicture);
+            }
+        };
+
+        fetchProfileImage();
+    }, [user]);
 
     const updateUserStats = async (field) => {
         if (!user) return;
@@ -40,7 +55,7 @@ const Main = () => {
             <div className="nav">
                 <p>AI Nutritionist</p>
                 <img
-                    src={assets.user_icon}
+                    src={profileImage || assets.user_icon}
                     alt="User Profile"
                     className="profile-icon"
                     onClick={() => navigate("/profile")}  // Navigate to profile page on click

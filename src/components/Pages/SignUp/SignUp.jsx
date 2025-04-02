@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
-import './SignUp.css';
-import { signup } from '../../../config/firebase';
-import { Link } from 'react-router-dom'; // Import Link
+import React, { useState } from "react";
+import "./SignUp.css";
+import { signup } from "../../../config/firebase";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; // Use react-toastify
 
 const SignUp = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSignUp = async () => {
-    await signup(username, email, password);
+    if (!username || !email || !password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      await signup(username, email, password);
+      toast.success("Signup complete! Redirecting to login...");
+      setTimeout(() => navigate("/login"), 2000);
+    } catch (error) {
+      console.error("Signup Error:", error); // Debugging
+      toast.error("Signup failed. Please try again.");
+    }
   };
 
   return (
@@ -47,9 +61,11 @@ const SignUp = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button type="button" onClick={handleSignUp}>Sign Up</button>
+          <button type="button" onClick={handleSignUp}>
+            Sign Up
+          </button>
           <p>
-            already have an account? <Link to="/login">Login</Link>
+            Already have an account? <Link to="/login">Login</Link>
           </p>
         </form>
       </div>

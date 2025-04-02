@@ -12,7 +12,6 @@ import Profile from './components/Pages/Profile/Profile';
 import Dashboard from './components/Pages/Dashboard/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { auth } from './config/firebase';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
