@@ -1,13 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Use the exact model name and SDK from the user's latest documentation
-const MODEL_NAME = "gemini-3-flash-preview"; 
+// Standardizing to 'gemini-flash-latest' for cross-version compatibility
+const MODEL_NAME = "gemini-flash-latest"; 
 
-// REQUIRED: Define VITE_GEMINI_API_KEY in your local .env file.
-// Do NOT hardcode the key here anymore, as GitHub's security crawler will automatically revoke it.
+// Using Vite environment variable for security
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-// Initialize using the new GoogleGenAI class as per user snippet
+// Initialize using the GoogleGenAI SDK as per user snippet
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 const fileToGenerativePart = (file) => {
@@ -32,7 +31,7 @@ const fileToGenerativePart = (file) => {
 const runChat = async (chatHistory, selectedImage = null) => {
     try {
         if (!API_KEY) {
-            throw new Error("API Key mission. Please provide a NEW VITE_GEMINI_API_KEY in your .env file.");
+            throw new Error("Missing API Key. Please ensure VITE_GEMINI_API_KEY is defined in your local .env file.");
         }
 
         const latestPrompt = chatHistory.length > 0 ? chatHistory[chatHistory.length - 1].content : "";
@@ -48,6 +47,7 @@ const runChat = async (chatHistory, selectedImage = null) => {
                 ]
             });
         } else {
+            // Stable text call using the @google/genai SDK pattern
             response = await ai.models.generateContent({
                 model: MODEL_NAME,
                 contents: latestPrompt
@@ -55,10 +55,10 @@ const runChat = async (chatHistory, selectedImage = null) => {
         }
 
         const responseText = response.text;
-        console.log("Gemini 3 Response:", responseText);
+        console.log("Gemini Response:", responseText);
         return responseText || "No response";
     } catch (error) {
-        console.error("Error in runChat (Gemini 3):", error);
+        console.error("Error in runChat:", error);
         throw error;
     }
 };
