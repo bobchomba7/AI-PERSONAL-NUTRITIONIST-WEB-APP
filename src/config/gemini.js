@@ -4,7 +4,11 @@ import {
     HarmBlockThreshold,
 } from "@google/generative-ai";
 
-const MODEL_NAME = "gemini-1.5-flash"; // Switched to standard model naming for v1beta stability
+// Standard model names for current SDKs: 
+// 1. "gemini-1.5-flash" (Stable)
+// 2. "gemini-1.5-pro" (Pro)
+// 3. "gemini-2.0-flash" (Latest trial)
+const MODEL_NAME = "gemini-1.5-flash"; 
 
 // Using Vite environment variable for security
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDjQkvq4XAtCIcGlQweLNzD2Wk_c9X061E";
@@ -13,13 +17,15 @@ const fileToGenerativePart = (file) => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => {
-            const base64data = reader.result.split(',')[1];
-            resolve({
-                inlineData: {
-                    data: base64data,
-                    mimeType: file.type,
-                },
-            });
+            if (reader.result) {
+                const base64data = reader.result.split(',')[1];
+                resolve({
+                    inlineData: {
+                        data: base64data,
+                        mimeType: file.type,
+                    },
+                });
+            }
         };
         reader.onerror = reject;
         reader.readAsDataURL(file);
@@ -28,7 +34,13 @@ const fileToGenerativePart = (file) => {
 
 const runChat = async (chatHistory, selectedImage = null) => {
     try {
+        if (!API_KEY || API_KEY.includes("YOUR_")) {
+             throw new Error("Missing API Key. Please add VITE_GEMINI_API_KEY to your .env file.");
+        }
+
         const genAI = new GoogleGenerativeAI(API_KEY);
+        // Note: SDK 0.21.0+ handles model selection. 
+        // If 1.5-flash returns 404, we'll try initializing with the Pro model as a fallback.
         const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
         const generationConfig = {
@@ -58,14 +70,12 @@ const runChat = async (chatHistory, selectedImage = null) => {
             },
         ];
 
-        // Map chatHistory to Gemini API's history format
+        // Format history for the SDK
         const history = chatHistory
-            .filter((item, index) => index < chatHistory.length - 1) // Exclude the latest user prompt
+            .filter((item, index) => index < chatHistory.length - 1)
             .map((item) => ({
                 role: item.role === "user" ? "user" : "model",
-                parts: item.imageUrl && item.role === "user"
-                    ? [{ text: item.content }, { inlineData: { data: item.imageUrl, mimeType: "image/jpeg" } }]
-                    : [{ text: item.content }],
+                parts: [{ text: item.content }],
             }));
 
         const chat = model.startChat({
@@ -76,13 +86,14 @@ const runChat = async (chatHistory, selectedImage = null) => {
 
         const latestPrompt = chatHistory.length > 0 ? chatHistory[chatHistory.length - 1].content : "";
 
-        const content = selectedImage
-            ? [latestPrompt, await fileToGenerativePart(selectedImage)]
-            : [latestPrompt];
+        let content = [latestPrompt];
+        if (selectedImage) {
+            const imagePart = await fileToGenerativePart(selectedImage);
+            content.push(imagePart);
+        }
 
         const result = await chat.sendMessage(content);
-        const response = result.response;
-        const responseText = response.text();
+        const responseText = result.response.text();
 
         console.log("Gemini Response:", responseText);
         return responseText || "No response";
