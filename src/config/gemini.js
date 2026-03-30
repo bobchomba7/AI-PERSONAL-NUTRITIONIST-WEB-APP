@@ -3,7 +3,9 @@ import { GoogleGenAI } from "@google/genai";
 // Use the exact model name and SDK from the user's latest documentation
 const MODEL_NAME = "gemini-3-flash-preview"; 
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDjQkvq4XAtCIcGlQweLNzD2Wk_c9X061E";
+// REQUIRED: Define VITE_GEMINI_API_KEY in your local .env file.
+// Do NOT hardcode the key here anymore, as GitHub's security crawler will automatically revoke it.
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 // Initialize using the new GoogleGenAI class as per user snippet
 const ai = new GoogleGenAI({ apiKey: API_KEY });
@@ -29,12 +31,14 @@ const fileToGenerativePart = (file) => {
 
 const runChat = async (chatHistory, selectedImage = null) => {
     try {
+        if (!API_KEY) {
+            throw new Error("API Key mission. Please provide a NEW VITE_GEMINI_API_KEY in your .env file.");
+        }
+
         const latestPrompt = chatHistory.length > 0 ? chatHistory[chatHistory.length - 1].content : "";
-        
         let response;
         
         if (selectedImage) {
-            // New SDK structure for multimodal
             const imagePart = await fileToGenerativePart(selectedImage);
             response = await ai.models.generateContent({
                 model: MODEL_NAME,
@@ -44,16 +48,13 @@ const runChat = async (chatHistory, selectedImage = null) => {
                 ]
             });
         } else {
-            // Simple text contents as per user snippet
             response = await ai.models.generateContent({
                 model: MODEL_NAME,
                 contents: latestPrompt
             });
         }
 
-        // The newest SDK returns the text property as per the user's snippet
         const responseText = response.text;
-
         console.log("Gemini 3 Response:", responseText);
         return responseText || "No response";
     } catch (error) {
