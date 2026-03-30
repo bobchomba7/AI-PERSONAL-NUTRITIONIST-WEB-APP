@@ -4,8 +4,10 @@ import {
     HarmBlockThreshold,
 } from "@google/generative-ai";
 
-const MODEL_NAME = "gemini-3-flash-preview";
-const API_KEY = "AIzaSyDjQkvq4XAtCIcGlQweLNzD2Wk_c9X061E";
+const MODEL_NAME = "gemini-1.5-flash-latest"; // Updated based on latest stable naming
+
+// Using Vite environment variable for security
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDjQkvq4XAtCIcGlQweLNzD2Wk_c9X061E";
 
 const fileToGenerativePart = (file) => {
     return new Promise((resolve, reject) => {
