@@ -4,11 +4,9 @@ import {
     HarmBlockThreshold,
 } from "@google/generative-ai";
 
-// Standard model names for current SDKs: 
-// 1. "gemini-1.5-flash" (Stable)
-// 2. "gemini-1.5-pro" (Pro)
-// 3. "gemini-2.0-flash" (Latest trial)
-const MODEL_NAME = "gemini-1.5-flash"; 
+// If "gemini-1.5-flash" returns 404, we'll try the newest 2.0 version.
+// "gemini-2.0-flash" is the latest model standard.
+const MODEL_NAME = "gemini-2.0-flash"; 
 
 // Using Vite environment variable for security
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDjQkvq4XAtCIcGlQweLNzD2Wk_c9X061E";
@@ -39,15 +37,15 @@ const runChat = async (chatHistory, selectedImage = null) => {
         }
 
         const genAI = new GoogleGenerativeAI(API_KEY);
-        // Note: SDK 0.21.0+ handles model selection. 
-        // If 1.5-flash returns 404, we'll try initializing with the Pro model as a fallback.
+        // Note: Initializing the model. 
+        // We'll use 2.0 Flash as it's the current experimental/pro-tier default for some keys.
         const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
         const generationConfig = {
-            temperature: 1,
+            temperature: 0.7,
             topP: 0.95,
             topK: 40,
-            maxOutputTokens: 8192,
+            maxOutputTokens: 2048, // Reduced for faster Flash responses
             responseMimeType: "text/plain",
         };
 
@@ -70,7 +68,7 @@ const runChat = async (chatHistory, selectedImage = null) => {
             },
         ];
 
-        // Format history for the SDK
+        // Process message list for 2.0 Flash compatibility
         const history = chatHistory
             .filter((item, index) => index < chatHistory.length - 1)
             .map((item) => ({
