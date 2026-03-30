@@ -4,7 +4,7 @@ import {
     HarmBlockThreshold,
 } from "@google/generative-ai";
 
-const MODEL_NAME = "gemini-1.5-flash-latest"; // Updated based on latest stable naming
+const MODEL_NAME = "gemini-1.5-flash"; // Switched to standard model naming for v1beta stability
 
 // Using Vite environment variable for security
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDjQkvq4XAtCIcGlQweLNzD2Wk_c9X061E";
