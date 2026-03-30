@@ -1,0 +1,72 @@
+/* 
+  GLOBAL STYLES & NUVIA DESIGN SYSTEM
+  Refined to match the user's uploaded theme exactly.
+*/
+:root {
+  /* Nuvia Color Palette */
+  --bg-color: #f0f7f4;         /* Softest Sage/White */
+  --primary-color: #0b1c18;    /* Dark Forest Teal */
+  --secondary-color: #a7d7c5;  /* Mint Green */
+  --accent-color: #e0f2f1;     /* Light Mint */
+  --white: #ffffff;
+  --text-dark: #0b1c18;
+  --text-light: #547d74;       /* Sage Grey */
+  --border-color: rgba(11, 28, 24, 0.08);
+
+  /* Fonts */
+  --font-main: 'Outfit', 'Inter', system-ui, sans-serif;
+  
+  /* Animations */
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-sm: 0 4px 6px rgba(11, 28, 24, 0.03);
+  --shadow-lg: 0 10px 40px rgba(11, 28, 24, 0.1);
+}
+
+/* Nuvia Dark Mode Palette */
+body.dark {
+  --bg-color: #050d0c;
+  --primary-color: #a7d7c5;
+  --secondary-color: #1a2e28;
+  --accent-color: #0b1c18;
+  --white: #0b1c18;
+  --text-dark: #f0f7f4;
+  --text-light: #a7d7c5;
+  --border-color: rgba(167, 215, 197, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-main);
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  transition: background-color 0.4s ease, color 0.4s ease;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: block;
+  animation: fadeIn 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+h1, h2, h3, h4 {
+  color: var(--primary-color);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Scrollbar refinement */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: var(--secondary-color); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
