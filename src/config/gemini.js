@@ -1,13 +1,13 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Switching to Gemini 2.0 Flash to resolve production 404 errors 
-// seen with certain API keys/regions on the 1.5 tier.
-const MODEL_NAME = "gemini-2.0-flash"; 
+// Standardizing strictly on Gemini 3 Flash Preview as per latest documentation
+const MODEL_NAME = "gemini-3-flash-preview"; 
 
 // Using Vite environment variable for security
+// Ensure VITE_GEMINI_API_KEY is defined in your local .env or Vercel dashboard
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-// Lazy initialization for production resilience
+// Initialize using the GoogleGenAI SDK pattern
 let ai;
 if (API_KEY) {
     ai = new GoogleGenAI({ apiKey: API_KEY });
@@ -35,7 +35,7 @@ const fileToGenerativePart = (file) => {
 const runChat = async (chatHistory, selectedImage = null) => {
     try {
         if (!API_KEY) {
-             throw new Error("API Key mission. Ensure VITE_GEMINI_API_KEY is set in your Hosting Environment Variables.");
+             throw new Error("Missing API Key. Please add VITE_GEMINI_API_KEY to your Vercel Environment Variables.");
         }
         
         if (!ai) {
@@ -45,6 +45,7 @@ const runChat = async (chatHistory, selectedImage = null) => {
         const latestPrompt = chatHistory.length > 0 ? chatHistory[chatHistory.length - 1].content : "";
         let response;
         
+        // As per Gemini 3 documentation, we'll use the simplified text-only contents if no image
         if (selectedImage) {
             const imagePart = await fileToGenerativePart(selectedImage);
             response = await ai.models.generateContent({
@@ -62,10 +63,10 @@ const runChat = async (chatHistory, selectedImage = null) => {
         }
 
         const responseText = response.text;
-        console.log("Gemini 2.0 Response:", responseText);
+        console.log("Gemini 3 Flash Response:", responseText);
         return responseText || "No response";
     } catch (error) {
-        console.error("Error in runChat:", error);
+        console.error("Error in runChat (Gemini 3):", error);
         throw error;
     }
 };
