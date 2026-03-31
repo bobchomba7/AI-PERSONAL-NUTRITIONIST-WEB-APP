@@ -1,12 +1,13 @@
 import { GoogleGenAI } from "@google/genai";
 
-const MODEL_NAME = "gemini-1.5-flash"; 
+// Switching to Gemini 2.0 Flash to resolve production 404 errors 
+// seen with certain API keys/regions on the 1.5 tier.
+const MODEL_NAME = "gemini-2.0-flash"; 
 
 // Using Vite environment variable for security
-// Note: This must be defined in your Hosting Dashboard (Vercel/Netlify) during deployment!
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-// Lazy initialization to prevent the app from crashing in the browser if the key is missing at load time
+// Lazy initialization for production resilience
 let ai;
 if (API_KEY) {
     ai = new GoogleGenAI({ apiKey: API_KEY });
@@ -37,7 +38,6 @@ const runChat = async (chatHistory, selectedImage = null) => {
              throw new Error("API Key mission. Ensure VITE_GEMINI_API_KEY is set in your Hosting Environment Variables.");
         }
         
-        // Re-initialize if not already done
         if (!ai) {
             ai = new GoogleGenAI({ apiKey: API_KEY });
         }
@@ -62,7 +62,7 @@ const runChat = async (chatHistory, selectedImage = null) => {
         }
 
         const responseText = response.text;
-        console.log("Gemini Response:", responseText);
+        console.log("Gemini 2.0 Response:", responseText);
         return responseText || "No response";
     } catch (error) {
         console.error("Error in runChat:", error);
