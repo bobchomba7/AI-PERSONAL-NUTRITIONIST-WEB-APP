@@ -1,13 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Standardizing to 'gemini-flash-latest' for cross-version compatibility
-const MODEL_NAME = "gemini-flash-latest"; 
+const MODEL_NAME = "gemini-1.5-flash"; 
 
 // Using Vite environment variable for security
+// Note: This must be defined in your Hosting Dashboard (Vercel/Netlify) during deployment!
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-// Initialize using the GoogleGenAI SDK as per user snippet
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+// Lazy initialization to prevent the app from crashing in the browser if the key is missing at load time
+let ai;
+if (API_KEY) {
+    ai = new GoogleGenAI({ apiKey: API_KEY });
+}
 
 const fileToGenerativePart = (file) => {
     return new Promise((resolve, reject) => {
@@ -31,7 +34,12 @@ const fileToGenerativePart = (file) => {
 const runChat = async (chatHistory, selectedImage = null) => {
     try {
         if (!API_KEY) {
-            throw new Error("Missing API Key. Please ensure VITE_GEMINI_API_KEY is defined in your local .env file.");
+             throw new Error("API Key mission. Ensure VITE_GEMINI_API_KEY is set in your Hosting Environment Variables.");
+        }
+        
+        // Re-initialize if not already done
+        if (!ai) {
+            ai = new GoogleGenAI({ apiKey: API_KEY });
         }
 
         const latestPrompt = chatHistory.length > 0 ? chatHistory[chatHistory.length - 1].content : "";
@@ -47,7 +55,6 @@ const runChat = async (chatHistory, selectedImage = null) => {
                 ]
             });
         } else {
-            // Stable text call using the @google/genai SDK pattern
             response = await ai.models.generateContent({
                 model: MODEL_NAME,
                 contents: latestPrompt
